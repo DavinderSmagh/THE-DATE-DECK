@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Date Deck · Interactive Romance & Couple Goals</title>
+  <meta name="description"
+    content="An interactive 3D decision rail and romantic cue card picker for couples. Choose what to eat, who plans tonight, and explore spontaneous date quests." />
+
+  <!-- Google Fonts: Editorial Serif + Modern Clean Sans + Monospace -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <!-- Fullscreen 3D Canvas Container -->
+  <div id="webgl-container"></div>
+
+  <!-- Ambient Cinematic Gradients -->
+  <div class="ambient-glow top-left"></div>
+  <div class="ambient-glow bottom-right"></div>
+
+  <!-- Top Navigation & Brand Header -->
+  <header class="app-header" id="app-header">
+    <div class="brand-group">
+      <div class="brand-badge">2026 EDITION</div>
+      <h1 class="brand-title"><span class="brand-dot">·</span> THE DATE DECK <span class="brand-dot">·</span></h1>
+      <!-- <p class="brand-subtitle">Interactive Romance & Decision</p> -->
+    </div>
+
+    <!-- Category Filter Bar -->
+    <nav class="category-nav" id="category-nav" aria-label="Deck Categories">
+      <button class="nav-chip active" data-category="all" id="btn-cat-all">
+        <span class="chip-icon">✨</span>
+        <span class="chip-label">All Cards</span>
+      </button>
+      <button class="nav-chip" data-category="eat" id="btn-cat-eat">
+        <span class="chip-icon">🍽️</span>
+        <span class="chip-label">What to Eat?</span>
+      </button>
+      <button class="nav-chip" data-category="date" id="btn-cat-date">
+        <span class="chip-icon">🕯️</span>
+        <span class="chip-label">Date Quests</span>
+      </button>
+      <button class="nav-chip" data-category="decide" id="btn-cat-decide">
+        <span class="chip-icon">🎲</span>
+        <span class="chip-label">Who Decides?</span>
+      </button>
+      <button class="nav-chip" data-category="sparks" id="btn-cat-sparks">
+        <span class="chip-icon">💬</span>
+        <span class="chip-label">Deep Sparks</span>
+      </button>
+      <button class="nav-chip" data-category="coupons" id="btn-cat-coupons">
+        <span class="chip-icon">🎟️</span>
+        <span class="chip-label">Vouchers</span>
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Theme Chooser (Light / Dark) -->
+      <div class="theme-chooser" id="theme-chooser" role="group" aria-label="Theme Selector">
+        <button class="theme-toggle-btn active" data-theme="light" id="theme-light-btn" title="Light Theme">
+          <span class="theme-icon">☀️</span>
+          <span class="theme-label">Light</span>
+        </button>
+        <button class="theme-toggle-btn" data-theme="dark" id="theme-dark-btn" title="Dark Theme">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-label">Dark</span>
+        </button>
+      </div>
+
+      <button class="btn-fate" id="btn-surprise-fate" title="Spin and let fate pick a card">
+        <span class="btn-icon">🎲</span>
+        <span class="btn-text">SURPRISE US</span>
+      </button>
+
+      <button class="btn-icon-only" id="btn-saved-dates" title="View Saved Dates" aria-label="Saved Dates">
+        <span class="btn-icon">📋</span>
+        <span class="saved-badge" id="saved-count">0</span>
+      </button>
+
+      <button class="btn-icon-only" id="btn-toggle-sound" title="Toggle Sound" aria-label="Toggle Sound">
+        <span class="btn-icon" id="sound-icon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Instruction Hint -->
+  <div class="rail-hint" id="rail-hint">
+    <div class="hint-pill">
+      <span class="hint-arrow">←</span>
+      <span class="hint-text">DRAG OR SWIPE RAIL TO BROWSE · CLICK ANY CARD TO INSPECT</span>
+      <span class="hint-arrow">→</span>
+    </div>
+  </div>
+
+  <!-- Card Focus HUD / Bottom Dock (Revealed when a card is selected) -->
+  <section class="card-focus-hud hidden" id="card-focus-hud" aria-label="Card Actions">
+    <div class="hud-inner">
+      <!-- Back to all cards -->
+      <button class="btn-back-deck" id="btn-back-deck" aria-label="Back to Deck">
+        <span>✕ ALL CARDS</span>
+      </button>
+
+      <!-- Explore Protocol Button -->
+      <button class="btn-explore-blueprint" id="btn-explore-blueprint" title="Explore what to do in detail">
+        <span class="explore-btn-icon">📜</span>
+        <span class="explore-btn-text">EXPLORE PROTOCOL</span>
+        <span class="explore-btn-arrow">↓</span>
+      </button>
+
+      <!-- Lock In Button -->
+      <button class="btn-lock-in" id="btn-lock-in">
+        <span class="btn-sparkle">✨</span>
+        <span class="lock-btn-text" id="lock-btn-text">LOCK IT IN</span>
+        <span class="lock-btn-arrow">♥</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Trendy Classy Scroll-Down Blueprint Window -->
+  <div class="blueprint-window-backdrop hidden" id="blueprint-window-backdrop">
+    <section class="blueprint-window" id="blueprint-window" aria-label="Date Protocol Blueprint">
+      <div class="blueprint-pull-handle"></div>
+
+      <div class="blueprint-window-header">
+        <div class="blueprint-header-badge-row">
+          <span class="blueprint-cat-badge" id="blueprint-modal-category">🍽️ WHAT TO EAT?</span>
+          <span class="blueprint-status-pill" id="blueprint-modal-badge">DECISION PROTOCOL</span>
+        </div>
+        <div class="blueprint-title-row">
+          <span class="blueprint-emoji" id="blueprint-modal-emoji">🍝</span>
+          <div class="blueprint-heading-group">
+            <h2 class="blueprint-heading" id="blueprint-modal-title">THE DINNER ROULETTE</h2>
+            <p class="blueprint-subheading" id="blueprint-modal-subtitle">The 3-Option Elimination Rule</p>
+          </div>
+        </div>
+        <button class="blueprint-close-icon" id="btn-close-blueprint" aria-label="Close details">✕</button>
+      </div>
+
+      <div class="blueprint-window-scroll-area">
+        <div class="blueprint-overview-box">
+          <span class="overview-sparkle">✦</span>
+          <p class="blueprint-desc" id="blueprint-modal-desc">Follow this exact 2-minute formula to find tonight's feast without tears:</p>
+        </div>
+
+        <div class="blueprint-section-label">
+          <span>WHAT WE HAVE TO DO · ACTION STEPS</span>
+        </div>
+
+        <!-- Trendy Classy Bullet Points List -->
+        <div class="blueprint-bullets-container" id="blueprint-bullets-container">
+          <!-- Dynamically populated with stylish numbered badges and descriptions -->
+        </div>
+      </div>
+
+      <div class="blueprint-window-footer">
+        <button class="btn-blueprint-copy" id="btn-copy-blueprint">
+          <span>📋 COPY MISSION</span>
+        </button>
+        <button class="btn-blueprint-lock" id="btn-confirm-blueprint">
+          <span>♥ ACCEPT & LOCK IN</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Locked Date Modal Voucher -->
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="voucher-modal" id="voucher-modal">
+      <button class="modal-close-btn" id="btn-close-modal" aria-label="Close Modal">✕</button>
+
+      <div class="voucher-header">
+        <div class="voucher-stamp">OFFICIAL COUPLE CONTRACT · 2026</div>
+        <div class="voucher-emoji" id="modal-emoji">🍝</div>
+        <h3 class="voucher-title" id="modal-title">THE DINNER ROULETTE</h3>
+        <p class="voucher-badge-text" id="modal-badge">DECISION PROTOCOL LOCKED</p>
+      </div>
+
+      <div class="voucher-body">
+        <p class="voucher-desc" id="modal-desc"></p>
+        <div class="voucher-steps" id="modal-steps"></div>
+      </div>
+
+      <div class="voucher-footer">
+        <button class="btn-secondary" id="btn-copy-plan">
+          <span>📋 COPY TO CLIPBOARD</span>
+        </button>
+        <button class="btn-primary" id="btn-confirm-date">
+          <span>♥ ACCEPT TONIGHT'S DATE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Dates Drawer -->
+  <div class="drawer-backdrop hidden" id="drawer-backdrop">
+    <aside class="saved-drawer" id="saved-drawer">
+      <div class="drawer-header">
+        <h3>OUR DATE VAULT</h3>
+        <button class="drawer-close-btn" id="btn-close-drawer">✕</button>
+      </div>
+      <div class="drawer-list" id="saved-drawer-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </aside>
+  </div>
+
+  <!-- Entry Script -->
+  <script type="module" src="./main.js"></script>
+</body>
+
+</html>
