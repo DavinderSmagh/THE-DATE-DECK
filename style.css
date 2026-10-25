@@ -392,6 +392,14 @@ body.card-zoomed .app-header {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
+.hint-desktop {
+  display: inline;
+}
+
+.hint-mobile {
+  display: none;
+}
+
 .hint-arrow {
   color: var(--gold-accent);
   animation: pulseArrow 1.5s infinite alternate ease-in-out;
@@ -1231,14 +1239,15 @@ body.card-zoomed .app-header {
 }
 
 /* ==========================================================================
-   Responsive Breakpoints
+   Responsive Breakpoints & Mobile Auto-Alignment
    ========================================================================== */
 @media (max-width: 900px) {
   .app-header {
     flex-wrap: wrap;
-    top: 16px;
+    top: max(14px, env(safe-area-inset-top, 14px));
     left: 16px;
     right: 16px;
+    gap: 12px;
   }
 
   .category-nav {
@@ -1246,30 +1255,393 @@ body.card-zoomed .app-header {
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
-    padding: 6px;
-    border-radius: 14px;
+    padding: 6px 8px;
+    border-radius: 50px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .category-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-chip {
-    padding: 6px 12px;
+    padding: 6px 13px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Mobile Header Auto-Alignment */
+  .app-header {
+    top: max(10px, env(safe-area-inset-top, 10px));
+    left: 12px;
+    right: 12px;
+    gap: 8px;
+  }
+
+  .brand-badge {
+    font-size: 8.5px;
+    padding: 2px 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .brand-title {
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .theme-chooser {
+    padding: 2px;
+  }
+
+  .theme-toggle-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .theme-toggle-btn span:not(.theme-icon) {
+    display: none;
+  }
+
+  .btn-fate {
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .btn-fate .btn-text {
+    display: none;
+  }
+
+  .btn-icon-only {
+    width: 34px;
+    height: 34px;
+  }
+
+  .btn-icon-only .btn-icon {
+    font-size: 14px;
+  }
+
+  .saved-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+    top: -2px;
+    right: -2px;
+  }
+
+  /* Category Nav Horizontal Scroll */
+  .category-nav {
+    order: 3;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 50px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .nav-chip {
+    padding: 5px 11px;
+    font-size: 11px;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .nav-chip .chip-icon {
     font-size: 12px;
   }
 
-  .hud-inner {
-    flex-direction: column;
-    gap: 16px;
+  /* Instruction Rail Hint on Mobile */
+  .rail-hint {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    width: 92%;
+    max-width: 360px;
   }
 
-  .hud-title {
-    font-size: 22px;
-  }
-
-  .hud-action {
+  .hint-pill {
+    padding: 7px 14px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    justify-content: center;
     width: 100%;
+  }
+
+  .hint-desktop {
+    display: none;
+  }
+
+  .hint-mobile {
+    display: inline;
+  }
+
+  /* Card Focus HUD on Mobile */
+  .card-focus-hud {
+    padding: 12px 14px max(16px, env(safe-area-inset-bottom, 16px));
+  }
+
+  .hud-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .hud-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn-back-deck {
+    width: 100%;
+    order: 2;
+    padding: 9px 14px;
+    font-size: 11px;
+    justify-content: center;
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-muted);
+  }
+
+  .btn-back-deck:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+  }
+
+  [data-theme="dark"] .btn-back-deck:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .btn-explore-blueprint {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 11.5px;
+    justify-content: center;
+    white-space: nowrap;
+    border-radius: 100px;
   }
 
   .btn-lock-in {
+    flex: 1.25;
+    padding: 11px 16px;
+    font-size: 12px;
+    justify-content: center;
+    white-space: nowrap;
+    border-radius: 100px;
+  }
+
+  /* Blueprint Modal Responsive Window */
+  .blueprint-window-backdrop {
+    padding: 12px 10px max(16px, env(safe-area-inset-bottom, 16px));
+    align-items: flex-end;
+  }
+
+  .blueprint-window {
+    border-radius: 24px 24px 18px 18px;
+    padding: 16px 16px 20px;
+    max-height: 88vh;
+    margin: 0;
+    width: 100%;
+  }
+
+  .blueprint-pull-handle {
+    margin-bottom: 12px;
+  }
+
+  .blueprint-window-header {
+    padding-bottom: 14px;
+  }
+
+  .blueprint-header-badge-row {
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .blueprint-cat-badge,
+  .blueprint-status-pill {
+    font-size: 9.5px;
+    padding: 3px 8px;
+  }
+
+  .blueprint-title-row {
+    gap: 12px;
+  }
+
+  .blueprint-emoji {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+    border-radius: 14px;
+  }
+
+  .blueprint-heading {
+    font-size: 19px;
+  }
+
+  .blueprint-subheading {
+    font-size: 12px;
+  }
+
+  .blueprint-close-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .blueprint-window-scroll-area {
+    max-height: 48vh;
+    padding: 12px 0 6px;
+  }
+
+  .blueprint-overview-box {
+    padding: 11px 13px;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .blueprint-desc {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .blueprint-section-label {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+
+  .blueprint-bullets-container {
+    gap: 8px;
+  }
+
+  .blueprint-bullet-item {
+    padding: 11px 13px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .blueprint-bullet-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .blueprint-bullet-text {
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  .blueprint-window-footer {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding-top: 14px;
+  }
+
+  .btn-blueprint-copy {
     width: 100%;
     justify-content: center;
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .btn-blueprint-lock {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 13px;
+  }
+
+  /* Acceptance Voucher Modal Responsive */
+  .modal-backdrop {
+    padding: 12px 10px max(16px, env(safe-area-inset-bottom, 16px));
+    align-items: flex-end;
+  }
+
+  .voucher-modal {
+    padding: 24px 18px 20px;
+    border-radius: 24px 24px 18px 18px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .voucher-stamp {
+    font-size: 9.5px;
+    margin-bottom: 8px;
+  }
+
+  .voucher-emoji {
+    font-size: 40px;
+    margin-bottom: 6px;
+  }
+
+  .voucher-title {
+    font-size: 21px;
+  }
+
+  .voucher-body {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .voucher-desc {
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+
+  .step-item {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .step-bullet {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .voucher-footer {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    width: 100%;
+    flex: none;
+    padding: 13px;
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  /* Saved Dates Drawer Responsive */
+  .saved-drawer {
+    max-width: 100%;
+    width: 100%;
+    border-left: none;
+    padding: 24px 18px max(24px, env(safe-area-inset-bottom, 24px));
+  }
+
+  .saved-item-title {
+    font-size: 15px;
   }
 }

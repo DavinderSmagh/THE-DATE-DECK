@@ -44,6 +44,44 @@ export class DateDeckScene {
     requestAnimationFrame(this.animate);
   }
 
+  getCameraConfig() {
+    const w = this.container ? this.container.clientWidth : window.innerWidth;
+    const h = this.container ? this.container.clientHeight : window.innerHeight;
+    const aspect = w / (h || 1);
+
+    if (aspect < 0.62) {
+      // Mobile portrait (smartphones)
+      return {
+        defaultY: 0.55,
+        defaultZ: 17.0,
+        zoomedY: 0.82,
+        zoomedZ: 10.4,
+        cardScaleResting: 0.94,
+        cardScaleZoomed: 1.02
+      };
+    } else if (aspect < 0.9) {
+      // Small tablets / foldables
+      return {
+        defaultY: 0.35,
+        defaultZ: 14.8,
+        zoomedY: 0.45,
+        zoomedZ: 9.0,
+        cardScaleResting: 0.96,
+        cardScaleZoomed: 1.04
+      };
+    } else {
+      // Desktop / Landscape
+      return {
+        defaultY: 0.1,
+        defaultZ: 12.8,
+        zoomedY: -0.2,
+        zoomedZ: 7.8,
+        cardScaleResting: 1.0,
+        cardScaleZoomed: 1.05
+      };
+    }
+  }
+
   initScene() {
     this.scene = new THREE.Scene();
     const isLight = this.theme === 'light';
@@ -56,7 +94,8 @@ export class DateDeckScene {
     const height = this.container.clientHeight;
 
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    this.cameraDefaultPos = new THREE.Vector3(0, 0.1, 12.8);
+    const cam = this.getCameraConfig();
+    this.cameraDefaultPos = new THREE.Vector3(0, cam.defaultY, cam.defaultZ);
     this.camera.position.copy(this.cameraDefaultPos);
     this.camera.lookAt(0, 0, 0);
 
@@ -470,6 +509,26 @@ export class DateDeckScene {
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(w, h);
+
+      const cam = this.getCameraConfig();
+      this.cameraDefaultPos.set(0, cam.defaultY, cam.defaultZ);
+      if (!this.isZoomed) {
+        gsap.to(this.camera.position, {
+          x: 0,
+          y: cam.defaultY,
+          z: cam.defaultZ,
+          duration: 0.35,
+          ease: 'power2.out'
+        });
+      } else {
+        gsap.to(this.camera.position, {
+          x: 0,
+          y: cam.zoomedY,
+          z: cam.zoomedZ,
+          duration: 0.35,
+          ease: 'power2.out'
+        });
+      }
     });
   }
 
@@ -591,11 +650,12 @@ export class DateDeckScene {
       ease: 'power3.inOut'
     });
 
+    const cam = this.getCameraConfig();
     // Dolly camera in
     gsap.to(this.camera.position, {
       x: 0,
-      y: -0.2,
-      z: 7.8,
+      y: cam.zoomedY,
+      z: cam.zoomedZ,
       duration: 1.1,
       ease: 'power3.inOut',
       onComplete: () => {
@@ -722,6 +782,8 @@ export class DateDeckScene {
       item.shineFrontMat.uniforms.uIntensity.value = 0.0;
     });
 
+    const cam = this.getCameraConfig();
+    this.cameraDefaultPos.set(0, cam.defaultY, cam.defaultZ);
     gsap.to(this.camera.position, {
       x: this.cameraDefaultPos.x,
       y: this.cameraDefaultPos.y,
@@ -758,9 +820,11 @@ export class DateDeckScene {
 
     const spinOffset = (Math.random() > 0.5 ? 1 : -1) * (this.cardSpacing * 5);
 
+    const cam = this.getCameraConfig();
     const tl = gsap.timeline();
     tl.to(this.camera.position, {
-      z: 12.8,
+      y: cam.defaultY,
+      z: cam.defaultZ,
       duration: 0.4,
       ease: 'power2.out'
     });
